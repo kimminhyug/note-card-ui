@@ -15,13 +15,9 @@ body {
 :root {
   /* /* --background: #ffffff; */
   --foreground: #171717;
-  --note-card-width: 100%;
   /* 황금비 사용  */
+  --note-card-width: 100%;
   --note-card-height: calc(var(--note-card-width) * 1.618);
-
-  --calc-note-card-width: calc(var(--note-card-width));
-  --calc-note-card-height: calc(var(--note-card-height));
-  /* --calc-note-card-height: calc(100% - var(--note-card-width)); */
   --purple: #7c00fe;
   --yellow: #f9e400;
   --blue: #0089ff;
@@ -53,28 +49,58 @@ body {
   position: relative;
   max-width: 100%;
   max-height: 100%;
-  height: 100%;
-  width: var(--calc-note-card-width);
-  height: var(--calc-note-card-height);
-  box-shadow: 0px 0px 1px 3px #5400ab;
+  width: var(--note-card-width);
+  height: var(--note-card-height);
+  .title {
+    height: 2em; /* 첫 줄을 6em로 설정 */
+    background-image: linear-gradient(to bottom, #e0e0e0 1px, transparent 1px);
+    background-size: 100% 2em; /* 줄 간격 설정 */
+    font-size: 2em;
+    font-weight: bold;
+    padding: 0.5em 0.25em;
+    &:empty {
+      display: none;
+    }
+  }
+
+  &.theme-purple {
+    box-shadow: 0px 0px 0px 3px var(--purple);
+  }
+  &.theme-blue {
+    box-shadow: 0px 0px 0px 3px var(--blue);
+  }
+  &.theme-light-red {
+    box-shadow: 0px 0px 0px 3px var(--light-red);
+  }
+  &.theme-orange {
+    box-shadow: 0px 0px 0px 3px var(--orange);
+  }
+
   box-sizing: border-box;
-  /*줄무늬 영역*/
-  background-color: #f9f9f9;
-  background-image: linear-gradient(0deg, #e0e0e0 1px, transparent 1px);
-  background-size: 100% 30px;
+
   /*폰트 영역*/
   color: #333;
   font-size: 14px;
-  font-family: "Arial", sans-serif;
-  padding: 4px;
-  /*줄 간격을 폰트 크기의 2배 + 컨테이너 padding/2*/
-  line-height: calc(2em + 1.5px);
+  font-family: 'Arial', sans-serif;
+  /* padding: 4px; */
+  padding: 0p 2px;
+  /*줄 간격을 폰트 크기의 2배 */
+  line-height: calc(2em);
   .card-content {
     width: 100%;
-    height: 100%;
+    height: calc(100% - 4em);
     position: relative;
-    z-index: 1;
     font-size: 1em;
+    background-color: #f9f9f9;
+    /*줄무늬 영역 줄 간격을 폰트의 2배로 설정*/
+    background-image: linear-gradient(to bottom, #e0e0e0 1px, transparent 1px);
+    background-size: 100% 2em;
+    span {
+      padding: 0px 0.5em;
+    }
+  }
+  .title:empty + .card-content {
+    height: 100%;
   }
 }
 
@@ -82,8 +108,8 @@ body {
   position: absolute;
   /*상위 lien-height 영향없도록 변경*/
   line-height: normal;
-  left: 100%;
-  top: 0px;
+  left: calc(100% + 3px);
+  top: -3px;
   width: fit-content;
   height: 100%;
   /*height 작아질시 스크롤 필요. 추후 [...] 처리 하는 컴포넌트 개발*/
@@ -94,10 +120,31 @@ body {
     cursor: pointer;
     position: relative;
     padding: 5px;
+    text-align: center;
     width: 25px;
     height: auto;
+    filter: opacity(0.6);
+
+    &.active {
+      filter: opacity(1);
+      font-weight: bold;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    &.theme-purple {
+      background: var(--purple);
+    }
+    &.theme-blue {
+      background: var(--blue);
+    }
+    &.theme-light-red {
+      background: var(--light-red);
+    }
+    &.theme-orange {
+      background: var(--orange);
+    }
     &:nth-child(n + 2) {
-      margin-top: 3px;
+      /* 탭간의 간격 없는게 더 괜찮아 보임 */
+      margin-top: 0px;
     }
   }
 }
