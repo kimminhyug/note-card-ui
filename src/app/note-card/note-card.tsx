@@ -7,7 +7,10 @@ export const NoteCard = () => {
   // card provider
   const [activeTab, setActiveTab] = useState(0);
   // context type 구현 필요, 계산로직필요
-  const [noteStyle, setNoteStyle] = useState({fontSize:'3em', lineHeight:'3em',backgroundSize:'100% 2em;'})
+  const [noteStyle, setNoteStyle] = useState({fontSize:'1em', lineHeight:'2em', backgroundSize:'100% 2em'})
+  // 컨텍스트 구현 필요 상태관리 필요 row는 한개씩만 active처리
+  const [rowList,setRowList]=  useState();
+
   const cardColor = {
     purple: 'theme-purple',
     orange: 'theme-orange',
@@ -20,12 +23,12 @@ export const NoteCard = () => {
       id: 'page1',
       name: '페이지 1',
       theme: cardColor.purple,
-      title: <span>i am title</span>,
-      contents: (
+      title: ()=><span>i am title</span>,
+      contents: ()=>(
         <>
-          <span>페이지 1 </span>
-          <span>콘테츠 1</span>
-          <span>콘테츠 2</span>
+          <Row>페이지 1 </Row>
+          <Row>콘테츠 1</Row>
+          <Row>콘테츠 2</Row>
         </>
       ),
     },
@@ -33,12 +36,12 @@ export const NoteCard = () => {
       id: 'page2',
       name: '페이지 2',
       theme: cardColor.orange,
-      title: <span>페이지 2</span>,
-      contents: (
+      title: ()=><Row>페이지 2</Row>,
+      contents: ()=>(
         <>
-          <span>페이지 2 </span>
-          <span>콘테츠 1</span>
-          <span>콘테츠 2</span>
+          <Row>페이지 2 </Row>
+          <Row>콘테츠 1</Row>
+          <Row>콘테츠 2</Row>
         </>
       ),
     },
@@ -46,12 +49,12 @@ export const NoteCard = () => {
       id: 'page3',
       name: '페이지 3',
       theme: cardColor['light-red'],
-      title: <span>페이지 3</span>,
-      contents: (
+      title: ()=><span>페이지 3</span>,
+      contents: ()=>(
         <>
-          <span>페이지 3 </span>
-          <span>콘테츠 1</span>
-          <span>콘테츠 2</span>
+          <Row>페이지 3 </Row>
+          <Row>콘테츠 1</Row>
+          <Row>콘테츠 2</Row>
         </>
       ),
     },
@@ -59,8 +62,8 @@ export const NoteCard = () => {
       id: 'page4',
       name: ' 프로바이더 테스트',
       theme: cardColor.blue,
-      // title: <span>페이지 2</span>,
-      contents: (
+      // title: ()=><Row>페이지 2</Row>,
+      contents: ()=>(
         <>
           <Row>페이지 4 </Row>
           <Row>나만 폰트가 3배야</Row>
@@ -90,8 +93,8 @@ export const NoteCard = () => {
           <div className="tab bg-light-red">페이지2</div>
           <div className="tab bg-blue">페이지2</div> */}
         </div>
-        <div className="title">{tabs[activeTab].title && tabs[activeTab].title}</div>
-        <div className="card-content flex-container flex-col">{tabs[activeTab].contents}</div>
+        <div className="title">{tabs[activeTab].title && tabs[activeTab].title()}</div>
+        <div className="card-content flex-container flex-col">{tabs[activeTab].contents()}</div>
         </NoteCardContext.Provider>
       </div>
 

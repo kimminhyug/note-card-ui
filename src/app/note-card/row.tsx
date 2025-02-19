@@ -1,4 +1,4 @@
-import { Children, CSSProperties, useContext } from "react";
+import { Children, CSSProperties, useContext, useState } from "react";
 import { NoteCardContext } from "./note-card-context";
 
 type IRow = (props:IRowProps)=>React.ReactElement;
@@ -11,5 +11,8 @@ interface IRowProps {
 }
 export const Row:IRow = ({children})=>{
   const noteStyle = useContext(NoteCardContext)
-  return (<><span style={noteStyle}  className="row">{children}</span></>)
+const [isActive,setIsActive]= useState<boolean>(false);
+
+  const handleClickRow=()=>{setIsActive((prev)=>!prev)}
+  return (<><span onClick={handleClickRow} style={noteStyle}  className={`row ${isActive?'active':''}`}>{children}</span></>)
 }
