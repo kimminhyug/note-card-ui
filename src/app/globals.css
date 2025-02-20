@@ -102,13 +102,11 @@ body {
   .title:empty + .card-content {
     height: 100%;
   }
-  .row{
+  .row {
     cursor: pointer;
-    &.active {
-      outline:1px solid rgb(59, 125, 248);
-      
-
-
+    &:focus {
+      outline: 1px solid rgb(59, 125, 248);
+      background-color: white;
     }
   }
 }
@@ -137,7 +135,7 @@ body {
     &.active {
       filter: opacity(1);
       font-weight: bold;
-      box-shadow: inset -1px 0px 1px 0px rgb(0 0 0 / 30%)
+      box-shadow: inset -1px 0px 1px 0px rgb(0 0 0 / 30%);
     }
     &.theme-purple {
       background: var(--purple);

@@ -12,7 +12,8 @@ export default function Home() {
         justifyItems: "center",
       }}
     >
-      <NoteCard />
+      {/* row count로 height 지정 또는 역으로 */}
+      <NoteCard rowCount={0} />
     </div>
   );
 }
