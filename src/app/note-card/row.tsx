@@ -22,7 +22,7 @@ export const Row: IRow = ({ children, onClick, className, id }) => {
   };
   return (
     <>
-      <span tabIndex={id} onClick={handleClickRow} style={noteStyle} className={`row ${className}`}>
+      <span id={id.toString()} tabIndex={id} onClick={handleClickRow} style={noteStyle} className={`row ${className}`}>
         {children}
       </span>
     </>

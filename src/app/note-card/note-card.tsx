@@ -3,6 +3,14 @@ import React, { useState } from 'react';
 import { NoteCardContext } from './note-card-context';
 import { Row } from './row';
 
+const cardColor = {
+  purple: 'theme-purple',
+  orange: 'theme-orange',
+  'light-red': 'theme-light-red',
+  blue: 'theme-blue',
+  none: '',
+};
+
 /** RowData
  *  tab: 탭 ID - 해당 탭에서만 출력
  *   order: Row Order에 사용 예정
@@ -15,18 +23,35 @@ type RowData = {
   content: string | React.ReactElement;
 };
 
-export const NoteCard = ({ rowCount }) => {
+// 폰트 사이즈
+interface INoteCardProps {
+  rowCount?: number;
+  // rowHeight: number| string;
+  fontSize?: number | string;
+}
+
+export const NoteCard = ({ rowCount, fontSize = '12px' }: INoteCardProps) => {
   // 탭 idx
   const [activeTab, setActiveTab] = useState(0);
   const [noteStyle, setNoteStyle] = useState({ fontSize: '1em', lineHeight: '2em', backgroundSize: '100% 2em' });
 
-  const cardColor = {
-    purple: 'theme-purple',
-    orange: 'theme-orange',
-    'light-red': 'theme-light-red',
-    blue: 'theme-blue',
-    none: '',
+  const handleNoteKeydown = (ev: React.KeyboardEvent<HTMLDivElement>) => {
+    const rows = document.querySelectorAll('.card-content .row');
+    const currentIdx = Array.from(rows).findIndex((e) => e === document.activeElement);
+
+    if (ev.key === 'ArrowDown') {
+      // 위에 1개가 더 존재하니깐 내려 갈수 있음 +1
+      if (currentIdx < rows.length - 1) {
+        (rows[currentIdx + 1] as HTMLSpanElement).focus();
+      }
+    } else if (ev.key === 'ArrowUp') {
+      // 0번쨰보다 크니 아직 올라갈 수 있음 방향키업
+      if (currentIdx > 0) {
+        (rows[currentIdx - 1] as HTMLSpanElement).focus();
+      }
+    }
   };
+
   // contents는 따로 가는게 관리하기 편할듯
   const tabs = [
     {
@@ -64,7 +89,7 @@ export const NoteCard = ({ rowCount }) => {
   const defaultRowList: RowData[] = [
     { tab: 0, order: 1, content: '콘테츠 1' },
     { tab: 0, order: 2, content: '콘테츠 2' },
-    { tab: 0, order: 2, content: '생각해보니 focus 쓰면 되네' },
+    { tab: 0, order: 3, content: '생각해보니 focus 쓰면 되네' },
 
     { tab: 1, order: 1, content: '탭1 - 콘테츠 1' },
     { tab: 1, order: 2, content: '탭1 - 콘테츠 2' },
@@ -93,7 +118,7 @@ export const NoteCard = ({ rowCount }) => {
   };
 
   return (
-    <div className={`note-card-container ${tabs[activeTab].theme}`}>
+    <div className={`note-card-container ${tabs[activeTab].theme}`} onKeyDown={handleNoteKeydown}>
       <NoteCardContext.Provider value={noteStyle}>
         <div className="tab-container">
           {tabs.map((tab, idx) => (
@@ -114,7 +139,7 @@ export const NoteCard = ({ rowCount }) => {
               <Row
                 // 탭 + order는 추가, 삭제아닌 경우 바뀔일이 없음. 불필요하게 마운트 일어나지 않도록 키 설정
                 key={`${row.tab}-${row.order}`}
-                id={row.order}
+                id={idx}
                 onClick={() => handleRowClick(row.order)}
                 // className={row.active ? 'active' : ''}
               >
