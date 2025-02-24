@@ -1,7 +1,7 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useReducer, useState } from 'react';
 import { NoteCardContext } from './note-card-context';
-import { Row } from './row';
+import { Row, RowData } from './row';
 
 const cardColor = {
   purple: 'theme-purple',
@@ -11,18 +11,6 @@ const cardColor = {
   none: '',
 };
 
-/** RowData
- *  tab: 탭 ID - 해당 탭에서만 출력
- *   order: Row Order에 사용 예정
- *   content: 일단 컨텐츠
- */
-
-type RowData = {
-  tab: number;
-  order: number;
-  content: string | React.ReactElement;
-};
-
 // 폰트 사이즈
 interface INoteCardProps {
   rowCount?: number;
@@ -30,11 +18,48 @@ interface INoteCardProps {
   fontSize?: number | string;
 }
 
+const ROW_ACTION = {
+  UPDATE: 'UPDATE',
+  ADD: 'ADD',
+  DELETE: 'DELTE',
+} as const;
+
+const defaultRowList: RowData[] = [
+  { tab: 0, order: 1, content: '콘테츠 1' },
+  { tab: 0, order: 2, content: '콘테츠 2' },
+  { tab: 0, order: 3, content: '생각해보니 focus 쓰면 되네' },
+
+  { tab: 1, order: 1, content: '탭1 - 콘테츠 1' },
+  { tab: 1, order: 2, content: '탭1 - 콘테츠 2' },
+
+  { tab: 2, order: 1, content: '콘테츠 1' },
+  { tab: 2, order: 2, content: '콘테츠 2' },
+
+  { tab: 3, order: 1, content: '나만 폰트가 3배야' },
+  { tab: 3, order: 2, content: 'NoteCardContext Provider' },
+  { tab: 3, order: 3, content: '계산 로직 구현해' },
+];
+
+const rowReducer = (state, action) => {
+  switch (action.type) {
+    case ROW_ACTION.UPDATE:
+      return state.map((row) =>
+        row.tab === action.tab && row.order === action.order ? { ...row, content: action.newContent } : row
+      );
+
+    default:
+      return state;
+  }
+};
+
 export const NoteCard = ({ rowCount, fontSize = '12px' }: INoteCardProps) => {
   // 탭 idx
   const [activeTab, setActiveTab] = useState(0);
   const [noteStyle, setNoteStyle] = useState({ fontSize: '1em', lineHeight: '2em', backgroundSize: '100% 2em' });
-
+  const [rowList, dispatch] = useReducer(rowReducer, defaultRowList);
+  const updateRow = (tab, order, newContent) => {
+    dispatch({ type: ROW_ACTION.UPDATE, tab, order, newContent });
+  };
   const handleNoteKeydown = (ev: React.KeyboardEvent<HTMLDivElement>) => {
     const rows = document.querySelectorAll('.card-content .row');
     const currentIdx = Array.from(rows).findIndex((e) => e === document.activeElement);
@@ -86,35 +111,18 @@ export const NoteCard = ({ rowCount, fontSize = '12px' }: INoteCardProps) => {
   //   1:[{ tab: 1, id: 1, content: '페이지 2',  }]
   // }
 
-  const defaultRowList: RowData[] = [
-    { tab: 0, order: 1, content: '콘테츠 1' },
-    { tab: 0, order: 2, content: '콘테츠 2' },
-    { tab: 0, order: 3, content: '생각해보니 focus 쓰면 되네' },
-
-    { tab: 1, order: 1, content: '탭1 - 콘테츠 1' },
-    { tab: 1, order: 2, content: '탭1 - 콘테츠 2' },
-
-    { tab: 2, order: 1, content: '콘테츠 1' },
-    { tab: 2, order: 2, content: '콘테츠 2' },
-
-    { tab: 3, order: 1, content: '나만 폰트가 3배야' },
-    { tab: 3, order: 2, content: 'NoteCardContext Provider' },
-    { tab: 3, order: 3, content: '계산 로직 구현해' },
-  ];
-
   const getCurrentRowList = (rowList, tabId: number) => {
     return rowList.filter((defaultRow) => defaultRow.tab === tabId);
   };
-
-  const [rowList, setRowList] = useState(defaultRowList);
 
   const handleSelectTab = (idx) => {
     setActiveTab(idx);
   };
 
   const handleRowClick = (id): void => {
+    console.log(id, ' clicked');
     // active 음 이거 남겨야하나
-    setRowList((prev) => prev.map((row) => (row.tab === activeTab ? { ...row, active: row.order === id } : row)));
+    // setRowList((prev) => prev.map((row) => (row.tab === activeTab ? { ...row, active: row.order === id } : row)));
   };
 
   return (
@@ -135,17 +143,24 @@ export const NoteCard = ({ rowCount, fontSize = '12px' }: INoteCardProps) => {
         <div className="card-content flex-container flex-col">
           {rowList
             .filter((row) => row.tab === activeTab)
-            .map((row, idx) => (
-              <Row
-                // 탭 + order는 추가, 삭제아닌 경우 바뀔일이 없음. 불필요하게 마운트 일어나지 않도록 키 설정
-                key={`${row.tab}-${row.order}`}
-                id={idx}
-                onClick={() => handleRowClick(row.order)}
-                // className={row.active ? 'active' : ''}
-              >
-                {row.content}
-              </Row>
-            ))}
+            .map((row, idx) => {
+              return (
+                <Row
+                  //
+                  // 탭 + order는 추가, 삭제아닌 경우 바뀔일이 없음. 불필요하게 마운트 일어나지 않도록 키 설정
+                  key={`${row.tab}-${row.order}`}
+                  id={idx}
+                  onClick={() => handleRowClick(row.order)}
+                  // text={row.content}
+                  // row
+                  row={row}
+                  updateRow={updateRow}
+                  // className={row.active ? 'active' : ''}
+                >
+                  {/* {row.content} */}
+                </Row>
+              );
+            })}
         </div>
       </NoteCardContext.Provider>
     </div>
