@@ -65,7 +65,7 @@ export const Row: IRow = ({ onClick, className, id, row, updateRow }) => {
           id={id.toString()}
           tabIndex={id}
           // onClick={handleClickRow}
-          style={noteStyle}
+          style={noteStyle.styles}
           className={rowClass}
         >
           {row.content}
@@ -79,7 +79,7 @@ export const Row: IRow = ({ onClick, className, id, row, updateRow }) => {
           // onClick={handleClickRow}
           onBlur={handleDisableFocus}
           onChange={(e) => updateRow(row.tab, row.order, e.currentTarget.value)}
-          style={noteStyle}
+          style={noteStyle.styles}
           className={rowClass}
           value={row.content}
         ></input>

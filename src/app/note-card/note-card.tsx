@@ -1,5 +1,5 @@
 'use client';
-import React, { useReducer, useState } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import { NoteCardContext } from './note-card-context';
 import { Row, RowData } from './row';
 
@@ -12,10 +12,11 @@ const cardColor = {
 };
 
 // 폰트 사이즈
-interface INoteCardProps {
+export interface INoteCardProps {
   rowCount?: number;
   // rowHeight: number| string;
-  fontSize?: number | string;
+
+  noteStyles?: { fontSize?: number | string; lineHeight?: number | string };
 }
 
 const ROW_ACTION = {
@@ -52,10 +53,20 @@ const rowReducer = (state, action) => {
   }
 };
 
-export const NoteCard = ({ rowCount, fontSize = '12px' }: INoteCardProps) => {
+const getFontSize = (size: string | number) => {
+  if (!size) return 1;
+  const result = size?.toString()?.match(/[\d.]+/);
+  return result ? Number(result?.[0]) : null;
+};
+export const NoteCard = ({ rowCount, noteStyles = {} }: INoteCardProps) => {
   // 탭 idx
   const [activeTab, setActiveTab] = useState(0);
-  const [noteStyle, setNoteStyle] = useState({ fontSize: '1em', lineHeight: '2em', backgroundSize: '100% 2em' });
+  const [noteStyle, setNoteStyle] = useState({
+    fontSize: noteStyles.fontSize || '1em',
+    lineHeight: noteStyles.lineHeight || '2em',
+    backgroundSize: `100% ${`${getFontSize(noteStyles.fontSize) * 2}em`}`,
+  });
+
   const [rowList, dispatch] = useReducer(rowReducer, defaultRowList);
   const updateRow = (tab, order, newContent) => {
     dispatch({ type: ROW_ACTION.UPDATE, tab, order, newContent });
@@ -76,7 +87,9 @@ export const NoteCard = ({ rowCount, fontSize = '12px' }: INoteCardProps) => {
       }
     }
   };
-
+  useEffect(() => {
+    setNoteStyle((prev) => ({ ...prev, ...noteStyles }));
+  }, [noteStyles]);
   // contents는 따로 가는게 관리하기 편할듯
   const tabs = [
     {
@@ -127,7 +140,7 @@ export const NoteCard = ({ rowCount, fontSize = '12px' }: INoteCardProps) => {
 
   return (
     <div className={`note-card-container ${tabs[activeTab].theme}`} onKeyDown={handleNoteKeydown}>
-      <NoteCardContext.Provider value={noteStyle}>
+      <NoteCardContext.Provider value={{ styles: noteStyle }}>
         <div className="tab-container">
           {tabs.map((tab, idx) => (
             <div
@@ -140,7 +153,7 @@ export const NoteCard = ({ rowCount, fontSize = '12px' }: INoteCardProps) => {
           ))}
         </div>
         <div className="title">{tabs[activeTab].title && tabs[activeTab].title()}</div>
-        <div className="card-content flex-container flex-col">
+        <div className="card-content flex-container flex-col" style={noteStyle}>
           {rowList
             .filter((row) => row.tab === activeTab)
             .map((row, idx) => {

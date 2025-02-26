@@ -53,9 +53,9 @@ body {
   height: var(--note-card-height);
   .title {
     height: 2em; /* 첫 줄을 6em로 설정 */
-    background-image: linear-gradient(to bottom, #e0e0e0 1px, transparent 1px);
-    background-size: 100% 2em; /* 줄 간격 설정 */
-    font-size: 2em;
+    /* background-image: linear-gradient(to bottom, #e0e0e0 1px, transparent 1px); */
+    /* background-size: 100% 2em; 
+    font-size: 2em; */
     font-weight: bold;
     padding: 0.5em 0.25em;
     &:empty {
@@ -80,7 +80,7 @@ body {
 
   /*폰트 영역*/
   color: #333;
-  font-size: 14px;
+  /* font-size: 14px; */
   font-family: 'Arial', sans-serif;
   /* padding: 4px; */
   padding: 0p 2px;
@@ -90,7 +90,7 @@ body {
     width: 100%;
     height: calc(100% - 4em);
     position: relative;
-    font-size: 1em;
+    /* font-size: 1em; */
     background-color: #f9f9f9;
     /*줄무늬 영역 줄 간격을 폰트의 2배로 설정*/
     background-image: linear-gradient(to bottom, #e0e0e0 1px, transparent 1px);

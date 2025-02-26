@@ -13,7 +13,7 @@ export default function Home() {
       }}
     >
       {/* row count로 height 지정 또는 역으로 */}
-      <NoteCard rowCount={0} />
+      <NoteCard rowCount={0} noteStyles={{ fontSize: '1.5em' }} />
     </div>
   );
 }
