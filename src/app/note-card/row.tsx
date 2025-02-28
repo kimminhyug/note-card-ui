@@ -1,5 +1,5 @@
 import { CSSProperties, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { NoteCardContext } from './note-card-context';
+import { NoteCardContext, NoteCardToolbarContext } from './note-card-context';
 /** RowData
  *  tab: 탭 ID - 해당 탭에서만 출력
  *   order: Row Order에 사용 예정
@@ -35,6 +35,7 @@ interface IRowProps {
 }
 export const Row: IRow = ({ onClick, className, id, row, updateRow }) => {
   const noteStyle = useContext(NoteCardContext);
+  const toolBar = useContext(NoteCardToolbarContext);
   const textFieldRef = useRef<HTMLInputElement>(null);
   const [mode, setMode] = useState<RowModeType>(ROW_MODE.VIEW);
   const rowClass = useMemo(() => `row full-size ${className}`, [className]);
@@ -44,8 +45,15 @@ export const Row: IRow = ({ onClick, className, id, row, updateRow }) => {
     }
   }, [mode]);
 
-  const handleClickRow = (ev: React.MouseEvent<HTMLDivElement>) => {
-    console.log('enable row focus');
+  const handleClickRow = (ev: React.MouseEvent<HTMLElement>) => {
+    console.log('enable row focus', ev);
+    const target = ev.target as HTMLElement;
+    const { left, top } = target.getBoundingClientRect();
+
+    // + window.scrollY - 30
+    // + window.scrollX - 30
+    // SCROLL 위치 포함
+    toolBar.setPosition({ x: window.scrollX + left, y: window.scrollY + top });
     setMode(ROW_MODE.EDIT);
   };
   const handleDisableFocus = () => {

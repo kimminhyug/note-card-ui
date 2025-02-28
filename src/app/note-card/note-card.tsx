@@ -1,7 +1,8 @@
 'use client';
 import React, { useEffect, useReducer, useState } from 'react';
-import { NoteCardContext } from './note-card-context';
+import { NoteCardContext, NoteCardToolbarContext } from './note-card-context';
 import { Row, RowData } from './row';
+import { Toolbar } from './toolbar';
 
 const cardColor = {
   purple: 'theme-purple',
@@ -61,6 +62,8 @@ const getFontSize = (size: string | number) => {
 export const NoteCard = ({ rowCount, noteStyles = {} }: INoteCardProps) => {
   // 탭 idx
   const [activeTab, setActiveTab] = useState(0);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+
   const [noteStyle, setNoteStyle] = useState({
     fontSize: noteStyles.fontSize || '1em',
     lineHeight: noteStyles.lineHeight || '2em',
@@ -139,43 +142,46 @@ export const NoteCard = ({ rowCount, noteStyles = {} }: INoteCardProps) => {
   };
 
   return (
-    <div className={`note-card-container ${tabs[activeTab].theme}`} onKeyDown={handleNoteKeydown}>
-      <NoteCardContext.Provider value={{ styles: noteStyle }}>
-        <div className="tab-container">
-          {tabs.map((tab, idx) => (
-            <div
-              key={idx}
-              className={`tab ${tab.theme} ${activeTab === idx ? 'active' : ''}`}
-              onClick={() => handleSelectTab(idx)}
-            >
-              {tab.name}
-            </div>
-          ))}
+    <NoteCardContext.Provider value={{ styles: noteStyle }}>
+      <NoteCardToolbarContext.Provider value={{ position: position, setPosition: setPosition }}>
+        <Toolbar />
+        <div className={`note-card-container ${tabs[activeTab].theme}`} onKeyDown={handleNoteKeydown}>
+          <div className="tab-container">
+            {tabs.map((tab, idx) => (
+              <div
+                key={idx}
+                className={`tab ${tab.theme} ${activeTab === idx ? 'active' : ''}`}
+                onClick={() => handleSelectTab(idx)}
+              >
+                {tab.name}
+              </div>
+            ))}
+          </div>
+          <div className="title">{tabs[activeTab].title && tabs[activeTab].title()}</div>
+          <div className="card-content flex-container flex-col" style={noteStyle}>
+            {rowList
+              .filter((row) => row.tab === activeTab)
+              .map((row, idx) => {
+                return (
+                  <Row
+                    //
+                    // 탭 + order는 추가, 삭제아닌 경우 바뀔일이 없음. 불필요하게 마운트 일어나지 않도록 키 설정
+                    key={`${row.tab}-${row.order}`}
+                    id={idx}
+                    onClick={() => handleRowClick(row.order)}
+                    // text={row.content}
+                    // row
+                    row={row}
+                    updateRow={updateRow}
+                    // className={row.active ? 'active' : ''}
+                  >
+                    {/* {row.content} */}
+                  </Row>
+                );
+              })}
+          </div>
         </div>
-        <div className="title">{tabs[activeTab].title && tabs[activeTab].title()}</div>
-        <div className="card-content flex-container flex-col" style={noteStyle}>
-          {rowList
-            .filter((row) => row.tab === activeTab)
-            .map((row, idx) => {
-              return (
-                <Row
-                  //
-                  // 탭 + order는 추가, 삭제아닌 경우 바뀔일이 없음. 불필요하게 마운트 일어나지 않도록 키 설정
-                  key={`${row.tab}-${row.order}`}
-                  id={idx}
-                  onClick={() => handleRowClick(row.order)}
-                  // text={row.content}
-                  // row
-                  row={row}
-                  updateRow={updateRow}
-                  // className={row.active ? 'active' : ''}
-                >
-                  {/* {row.content} */}
-                </Row>
-              );
-            })}
-        </div>
-      </NoteCardContext.Provider>
-    </div>
+      </NoteCardToolbarContext.Provider>
+    </NoteCardContext.Provider>
   );
 };
