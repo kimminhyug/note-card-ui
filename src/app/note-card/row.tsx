@@ -1,4 +1,5 @@
 import { CSSProperties, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { getFontSize } from './note-card';
 import { NoteCardContext, NoteCardToolbarContext } from './note-card-context';
 /** RowData
  *  tab: 탭 ID - 해당 탭에서만 출력
@@ -38,7 +39,7 @@ export const Row: IRow = ({ onClick, className, id, row, updateRow }) => {
   const toolBar = useContext(NoteCardToolbarContext);
   const textFieldRef = useRef<HTMLInputElement>(null);
   const [mode, setMode] = useState<RowModeType>(ROW_MODE.VIEW);
-  const rowClass = useMemo(() => `row full-size ${className}`, [className]);
+  const rowClass = useMemo(() => `row-textField full-size ${className}`, [className]);
   useEffect(() => {
     if (textFieldRef.current) {
       textFieldRef.current?.select();
@@ -48,12 +49,12 @@ export const Row: IRow = ({ onClick, className, id, row, updateRow }) => {
   const handleClickRow = (ev: React.MouseEvent<HTMLElement>) => {
     console.log('enable row focus', ev);
     const target = ev.target as HTMLElement;
-    const { left, top } = target.getBoundingClientRect();
+    const { left, right, top } = target.getBoundingClientRect();
 
     // + window.scrollY - 30
     // + window.scrollX - 30
     // SCROLL 위치 포함
-    toolBar.setPosition({ x: window.scrollX + left, y: window.scrollY + top });
+    toolBar.setPosition({ x: window.scrollX + right - 100, y: window.scrollY + top - 30 });
     setMode(ROW_MODE.EDIT);
   };
   const handleDisableFocus = () => {
@@ -67,13 +68,18 @@ export const Row: IRow = ({ onClick, className, id, row, updateRow }) => {
   };
 
   return (
-    <div className="row full-width" tabIndex={id} onClick={handleClickRow}>
+    <div
+      className="row full-width"
+      tabIndex={id}
+      onClick={handleClickRow}
+      style={{ lineHeight: `${getFontSize(noteStyle.styles.fontSize) * 2}em`, fontSize: '1em' }}
+    >
       {mode === ROW_MODE.VIEW ? (
         <span
           id={id.toString()}
           tabIndex={id}
-          // onClick={handleClickRow}
-          style={noteStyle.styles}
+          onClick={handleClickRow}
+          // style={noteStyle.styles}
           className={rowClass}
         >
           {row.content}
@@ -87,7 +93,7 @@ export const Row: IRow = ({ onClick, className, id, row, updateRow }) => {
           // onClick={handleClickRow}
           onBlur={handleDisableFocus}
           onChange={(e) => updateRow(row.tab, row.order, e.currentTarget.value)}
-          style={noteStyle.styles}
+          // style={noteStyle.styles}
           className={rowClass}
           value={row.content}
         ></input>

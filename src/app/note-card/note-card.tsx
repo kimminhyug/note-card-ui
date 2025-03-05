@@ -54,7 +54,7 @@ const rowReducer = (state, action) => {
   }
 };
 
-const getFontSize = (size: string | number) => {
+export const getFontSize = (size: string | number) => {
   if (!size) return 1;
   const result = size?.toString()?.match(/[\d.]+/);
   return result ? Number(result?.[0]) : null;

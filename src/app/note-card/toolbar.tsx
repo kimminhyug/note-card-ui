@@ -12,6 +12,8 @@ export const Toolbar = (): React.ReactElement => {
           top: toolbarContext.position.y,
           left: toolbarContext.position.x,
           zIndex: 3,
+          width: 80,
+          height: 30,
           background: 'white',
         }}
       >
