@@ -39,7 +39,7 @@ export const Row: IRow = ({ onClick, className, id, row, updateRow }) => {
   const toolBar = useContext(NoteCardToolbarContext);
   const textFieldRef = useRef<HTMLInputElement>(null);
   const [mode, setMode] = useState<RowModeType>(ROW_MODE.VIEW);
-  const rowClass = useMemo(() => `row-textField full-size ${className}`, [className]);
+  const rowClass = useMemo(() => `row-textField full-size ${className || ''}`, [className]);
   useEffect(() => {
     if (textFieldRef.current) {
       textFieldRef.current?.select();
@@ -96,7 +96,7 @@ export const Row: IRow = ({ onClick, className, id, row, updateRow }) => {
           // style={noteStyle.styles}
           className={rowClass}
           value={row.content}
-        ></input>
+        />
       )}
     </div>
   );

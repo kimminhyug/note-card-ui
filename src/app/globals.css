@@ -81,7 +81,7 @@ body {
   /*폰트 영역*/
   color: #333;
   /* font-size: 14px; */
-  font-family: 'Arial', sans-serif;
+  font-family: Arial, sans-serif;
   /* padding: 4px; */
   padding: 0p 2px;
   /*줄 간격을 폰트 크기의 2배 */
@@ -106,7 +106,7 @@ body {
     cursor: pointer;
 
     &:focus {
-      outline: 1px solid rgb(59, 125, 248);
+      /* outline: 1px solid rgb(59, 125, 248); */
       background-color: white;
     }
     span {
@@ -114,6 +114,9 @@ body {
       height: 100%;
     }
     & .row-textField {
+      &:focus {
+        outline: 1px solid rgb(59, 125, 248);
+      }
       border: 0px;
       height: 100%;
       font-size: 1em;
@@ -196,4 +199,26 @@ body {
 }
 .full-height {
   height: 100%;
+}
+
+.toolbar-container {
+  position: absolute;
+  /* outline: 1px solid rgb(41 146 255); */
+  border-radius: 5px;
+  background-color: rgb(41 146 255);
+  color: white;
+  align-items: center;
+  /* border-bottom: 0px; */
+  z-index: 3;
+  /* width: 80px; */
+  height: 30px;
+  padding: 3px;
+  & .toolbar-item {
+    flex: 1;
+    cursor: pointer;
+    min-width: 25px;
+    /* border: 1px solid; */
+    align-items: center;
+    text-align: center;
+  }
 }
