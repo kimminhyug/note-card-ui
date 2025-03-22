@@ -4,11 +4,16 @@ import { NoteCardContext, NoteCardToolbarContext } from './note-card-context';
 import { Row, RowData } from './row';
 import { Toolbar } from './toolbar';
 
+const isEmpty = (v) => {
+  return (v === '' || v === null || v === undefined || v?.length === 0) && v !== 0;
+};
+
 const cardColor = {
   purple: 'theme-purple',
   orange: 'theme-orange',
   'light-red': 'theme-light-red',
   blue: 'theme-blue',
+  black: 'theme-black',
   none: '',
 };
 
@@ -62,6 +67,9 @@ export const getFontSize = (size: string | number) => {
 export const NoteCard = ({ rowCount, noteStyles = {} }: INoteCardProps) => {
   // 탭 idx
   const [activeTab, setActiveTab] = useState(0);
+  // modal재활용할까음
+  const [openAddModal, setOpenAddModal] = useState(false);
+  const [newName, setNewName] = useState<string>('');
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
   const [noteStyle, setNoteStyle] = useState({
@@ -94,7 +102,7 @@ export const NoteCard = ({ rowCount, noteStyles = {} }: INoteCardProps) => {
     setNoteStyle((prev) => ({ ...prev, ...noteStyles }));
   }, [noteStyles]);
   // contents는 따로 가는게 관리하기 편할듯
-  const tabs = [
+  const [tabs, setTabs] = useState([
     {
       id: 'page1',
       name: '페이지 1',
@@ -107,19 +115,25 @@ export const NoteCard = ({ rowCount, noteStyles = {} }: INoteCardProps) => {
       theme: cardColor.orange,
       title: () => <span>페이지 2</span>,
     },
+    // {
+    //   id: 'page3',
+    //   name: '페이지 3',
+    //   theme: cardColor['light-red'],
+    //   title: () => <span>페이지 3</span>,
+    // },
+    // {
+    //   id: 'page4',
+    //   name: ' 프로바이더 테스트',
+    //   theme: cardColor.blue,
+    //   // title: ()=><Row>페이지 2</Row>,
+    // },
     {
-      id: 'page3',
-      name: '페이지 3',
-      theme: cardColor['light-red'],
-      title: () => <span>페이지 3</span>,
-    },
-    {
-      id: 'page4',
-      name: ' 프로바이더 테스트',
-      theme: cardColor.blue,
+      id: 'add',
+      name: ' +',
+      theme: cardColor.black,
       // title: ()=><Row>페이지 2</Row>,
     },
-  ];
+  ]);
   // 컴포넌트 props
   // 컴포넌트 컨셉이 데이터가 많을꺼 같진 않으니 1개의 배열에 모두 관리
   // {
@@ -131,8 +145,13 @@ export const NoteCard = ({ rowCount, noteStyles = {} }: INoteCardProps) => {
     return rowList.filter((defaultRow) => defaultRow.tab === tabId);
   };
 
-  const handleSelectTab = (idx) => {
-    setActiveTab(idx);
+  const handleSelectTab = (id, idx) => {
+    if (id === 'add') {
+      setOpenAddModal(true);
+    } else {
+      setOpenAddModal(false);
+      setActiveTab(idx);
+    }
   };
 
   const handleRowClick = (id): void => {
@@ -140,18 +159,37 @@ export const NoteCard = ({ rowCount, noteStyles = {} }: INoteCardProps) => {
     // active 음 이거 남겨야하나
     // setRowList((prev) => prev.map((row) => (row.tab === activeTab ? { ...row, active: row.order === id } : row)));
   };
+  const handleChangeNewTabName = (ev) => {
+    setNewName(ev.target.value);
+  };
+  const handleSubmitNewTab = () => {
+    if (isEmpty(newName)) return;
+    setTabs((prev) => [
+      ...prev,
+      { id: newName, name: newName, theme: cardColor.black, title: () => <span>{newName}</span> },
+    ]);
+  };
 
   return (
     <NoteCardContext.Provider value={{ styles: noteStyle }}>
       <NoteCardToolbarContext.Provider value={{ position: position, setPosition: setPosition }}>
         <Toolbar />
+        {openAddModal && (
+          <div className="add-tab-modal">
+            <div>add</div>
+            <div>
+              <input type="text" onChange={handleChangeNewTabName}></input>
+              <button onClick={handleSubmitNewTab}>추가</button>
+            </div>
+          </div>
+        )}
         <div className={`note-card-container ${tabs[activeTab].theme}`} onKeyDown={handleNoteKeydown}>
           <div className="tab-container">
             {tabs.map((tab, idx) => (
               <div
                 key={idx}
                 className={`tab ${tab.theme} ${activeTab === idx ? 'active' : ''}`}
-                onClick={() => handleSelectTab(idx)}
+                onClick={() => handleSelectTab(tab.id, idx)}
               >
                 {tab.name}
               </div>

@@ -22,6 +22,7 @@ body {
   --yellow: #f9e400;
   --blue: #0089ff;
   --orange: #ffaf00;
+  --black: black;
   --light-red: #f5004f;
 }
 
@@ -74,6 +75,10 @@ body {
   }
   &.theme-orange {
     box-shadow: 0px 0px 0px 3px var(--orange);
+  }
+  &.theme-black {
+    color: white;
+    box-shadow: 0px 0px 0px 3px var(--black);
   }
 
   box-sizing: border-box;
@@ -163,6 +168,9 @@ body {
     &.theme-orange {
       background: var(--orange);
     }
+    &.theme-black {
+      background: var(--black);
+    }
     &:nth-child(n + 2) {
       /* 탭간의 간격 없는게 더 괜찮아 보임 */
       margin-top: 0px;
@@ -181,6 +189,9 @@ body {
 }
 .bg-orange {
   background: var(--orange);
+}
+.bg-black {
+  background: var(--black);
 }
 
 .flex-container {
@@ -221,4 +232,16 @@ body {
     align-items: center;
     text-align: center;
   }
+}
+.add-tab-modal {
+  position: absolute;
+  left: calc(50% - 150px);
+  top: calc(50% - 75px);
+  background: white;
+
+  text-align: center;
+  align-content: center;
+  width: 300px;
+  height: 150px;
+  z-index: 1;
 }
