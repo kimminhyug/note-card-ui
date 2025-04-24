@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useReducer, useState } from 'react';
+import React, { CSSProperties, useEffect, useReducer, useState } from 'react';
 import { NoteCardContext, NoteCardToolbarContext } from './note-card-context';
 import { Row, RowData } from './row';
 import { Toolbar } from './toolbar';
@@ -22,7 +22,7 @@ export interface INoteCardProps {
   rowCount?: number;
   // rowHeight: number| string;
 
-  noteStyles?: { fontSize?: number | string; lineHeight?: number | string };
+  noteStyles?: { fontSize?: number | string; lineHeight?: number | string; titleHeight?: number | string };
 }
 
 const ROW_ACTION = {
@@ -34,7 +34,7 @@ const ROW_ACTION = {
 const defaultRowList: RowData[] = [
   { tab: 0, order: 1, content: '콘테츠 1' },
   { tab: 0, order: 2, content: '콘테츠 2' },
-  { tab: 0, order: 3, content: '생각해보니 focus 쓰면 되네' },
+  { tab: 0, order: 3, content: '' },
 
   { tab: 1, order: 1, content: '탭1 - 콘테츠 1' },
   { tab: 1, order: 2, content: '탭1 - 콘테츠 2' },
@@ -59,12 +59,28 @@ const rowReducer = (state, action) => {
   }
 };
 
+interface INoteContentStyle {
+  // fontSize: number | string;
+  // lineHeight: number | string;
+  // backgroundSize: number | string;
+}
+interface INoteTitleStyle {
+  // height: number | string;
+}
+interface INoteContainerStyle {
+  // height: number | string;
+}
+export interface INoteStyles {
+  content: INoteContentStyle & CSSProperties;
+  title: INoteTitleStyle & CSSProperties;
+  container: INoteContainerStyle & CSSProperties;
+}
 export const getFontSize = (size: string | number) => {
   if (!size) return 1;
   const result = size?.toString()?.match(/[\d.]+/);
   return result ? Number(result?.[0]) : null;
 };
-export const NoteCard = ({ rowCount, noteStyles = {} }: INoteCardProps) => {
+export const NoteCard = ({ rowCount = 6, noteStyles = {} }: INoteCardProps) => {
   // 탭 idx
   const [activeTab, setActiveTab] = useState(0);
   // modal재활용할까음
@@ -72,10 +88,16 @@ export const NoteCard = ({ rowCount, noteStyles = {} }: INoteCardProps) => {
   const [newName, setNewName] = useState<string>('');
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
-  const [noteStyle, setNoteStyle] = useState({
-    fontSize: noteStyles.fontSize || '1em',
-    lineHeight: noteStyles.lineHeight || '2em',
-    backgroundSize: `100% ${`${getFontSize(noteStyles.fontSize) * 2}em`}`,
+  const [noteStyle, setNoteStyle] = useState<INoteStyles>({
+    content: {
+      fontSize: noteStyles.fontSize || '1rem',
+      lineHeight: `${getFontSize(noteStyles.fontSize)}em` || '2rem',
+      backgroundSize: `100% ${`${getFontSize(noteStyles.fontSize) * 2}rem`}`,
+    },
+    title: { height: noteStyles.titleHeight || `2rem` },
+    container: {
+      minHeight: `calc(${`${getFontSize(noteStyles.fontSize)}em` || '2rem'} * ${rowCount} + ${noteStyles.titleHeight || '2rem'})`,
+    },
   });
 
   const [rowList, dispatch] = useReducer(rowReducer, defaultRowList);
@@ -98,9 +120,7 @@ export const NoteCard = ({ rowCount, noteStyles = {} }: INoteCardProps) => {
       }
     }
   };
-  useEffect(() => {
-    setNoteStyle((prev) => ({ ...prev, ...noteStyles }));
-  }, [noteStyles]);
+
   // contents는 따로 가는게 관리하기 편할듯
   const [tabs, setTabs] = useState([
     {
@@ -183,7 +203,11 @@ export const NoteCard = ({ rowCount, noteStyles = {} }: INoteCardProps) => {
             </div>
           </div>
         )}
-        <div className={`note-card-container ${tabs[activeTab].theme}`} onKeyDown={handleNoteKeydown}>
+        <div
+          className={`note-card-container ${tabs[activeTab].theme}`}
+          onKeyDown={handleNoteKeydown}
+          style={noteStyle.container}
+        >
           <div className="tab-container">
             {tabs.map((tab, idx) => (
               <div
@@ -195,8 +219,10 @@ export const NoteCard = ({ rowCount, noteStyles = {} }: INoteCardProps) => {
               </div>
             ))}
           </div>
-          <div className="title">{tabs[activeTab].title && tabs[activeTab].title()}</div>
-          <div className="card-content flex-container flex-col" style={noteStyle}>
+          <div className="title" style={noteStyle.title}>
+            {tabs[activeTab].title && tabs[activeTab].title()}
+          </div>
+          <div className="card-content flex-container flex-col" style={noteStyle.content}>
             {rowList
               .filter((row) => row.tab === activeTab)
               .map((row, idx) => {

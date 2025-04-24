@@ -72,7 +72,7 @@ export const Row: IRow = ({ onClick, className, id, row, updateRow }) => {
       className="row full-width"
       tabIndex={id}
       onClick={handleClickRow}
-      style={{ lineHeight: `${getFontSize(noteStyle.styles.fontSize) * 2}em`, fontSize: '1em' }}
+      style={{ lineHeight: `${getFontSize(noteStyle.styles.content.fontSize) * 2}rem`, fontSize: '1rem' }}
     >
       {mode === ROW_MODE.VIEW ? (
         <span

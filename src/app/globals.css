@@ -53,12 +53,12 @@ body {
   width: var(--note-card-width);
   height: var(--note-card-height);
   .title {
-    height: 2em; /* 첫 줄을 6em로 설정 */
+    height: 2rem; /* 첫 줄을 6rem로 설정 */
     /* background-image: linear-gradient(to bottom, #e0e0e0 1px, transparent 1px); */
-    /* background-size: 100% 2em; 
-    font-size: 2em; */
+    /* background-size: 100% 2rem; 
+    font-size: 2rem; */
     font-weight: bold;
-    padding: 0.5em 0.25em;
+    padding: 0.5rem 0.25rem;
     &:empty {
       display: none;
     }
@@ -90,18 +90,18 @@ body {
   /* padding: 4px; */
   padding: 0p 2px;
   /*줄 간격을 폰트 크기의 2배 */
-  line-height: calc(2em);
+  line-height: calc(2rem);
   .card-content {
     width: 100%;
-    height: calc(100% - 4em);
+    height: calc(100% - 2rem);
     position: relative;
-    /* font-size: 1em; */
+    /* font-size: 1rem; */
     background-color: #f9f9f9;
     /*줄무늬 영역 줄 간격을 폰트의 2배로 설정*/
     background-image: linear-gradient(to bottom, #e0e0e0 1px, transparent 1px);
-    background-size: 100% 2em;
+    background-size: 100% 2rem;
     span {
-      padding: 0px 0.5em;
+      padding: 0px 0.5rem;
     }
   }
   .title:empty + .card-content {
@@ -124,8 +124,8 @@ body {
       }
       border: 0px;
       height: 100%;
-      font-size: 1em;
-      padding: 0px 0.5em;
+      font-size: 1rem;
+      padding: 0px 0.5rem;
     }
   }
 }
@@ -140,7 +140,7 @@ body {
   height: 100%;
   /*height 작아질시 스크롤 필요. 추후 [...] 처리 하는 컴포넌트 개발*/
   overflow-y: auto;
-  font-size: 0.8em;
+  font-size: 0.8rem;
   .tab {
     color: white;
     cursor: pointer;

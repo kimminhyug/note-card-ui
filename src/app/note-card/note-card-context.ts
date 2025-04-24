@@ -1,7 +1,13 @@
 import { createContext } from 'react';
-import { INoteCardProps } from './note-card';
+import { INoteCardProps, INoteStyles } from './note-card';
 
-export const NoteCardContext = createContext<{ styles: INoteCardProps['noteStyles'] }>({ styles: { fontSize: '1em' } });
+export const NoteCardContext = createContext<{ styles: INoteStyles }>({
+  styles: {
+    content: undefined,
+    title: undefined,
+    container: undefined,
+  },
+});
 export const NoteCardToolbarContext = createContext<{
   setPosition?: ({ x, y }) => void;
   position: { x: number; y: number };
