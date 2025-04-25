@@ -39,10 +39,15 @@ export const Row: IRow = ({ onClick, className, id, row, updateRow }) => {
   const toolBar = useContext(NoteCardToolbarContext);
   const textFieldRef = useRef<HTMLInputElement>(null);
   const [mode, setMode] = useState<RowModeType>(ROW_MODE.VIEW);
+  // const [hasSelectedRowBrother, setHasSelectedRowBrother] = useState(false);
   const rowClass = useMemo(() => `row-textField full-size ${className || ''}`, [className]);
   useEffect(() => {
-    if (textFieldRef.current) {
-      textFieldRef.current?.select();
+    if (mode === ROW_MODE.EDIT) {
+      if (textFieldRef.current) {
+        textFieldRef.current?.select();
+      }
+    } else {
+      console.log(mode);
     }
   }, [mode]);
 
@@ -56,14 +61,22 @@ export const Row: IRow = ({ onClick, className, id, row, updateRow }) => {
     // SCROLL 위치 포함
     toolBar.setPosition({ x: window.scrollX + right - 100, y: window.scrollY + top - 30 });
     setMode(ROW_MODE.EDIT);
+    toolBar.setSelectedRow(row);
   };
-  const handleDisableFocus = () => {
-    console.log('disable row focus');
+  const handleDisableFocus = (e?: React.FocusEvent<HTMLDivElement>) => {
+    if (e) {
+      const nextFocused = e.relatedTarget as HTMLElement | null;
+      if (nextFocused && e.currentTarget.parentElement?.contains(nextFocused)) {
+      } else {
+        setTimeout(() => toolBar.setSelectedRow(null), 300);
+      }
+    }
     setMode(ROW_MODE.VIEW);
+    console.log('disable row focus');
   };
   const handleRowKeydown = (ev: React.KeyboardEvent<HTMLInputElement>) => {
     if (ev.key === 'Enter') {
-      handleDisableFocus();
+      handleDisableFocus(null);
     }
   };
 
@@ -71,6 +84,7 @@ export const Row: IRow = ({ onClick, className, id, row, updateRow }) => {
     <div
       className="row full-width"
       tabIndex={id}
+      onBlur={handleDisableFocus}
       onClick={handleClickRow}
       style={{ lineHeight: `${getFontSize(noteStyle.styles.content.fontSize) * 2}rem`, fontSize: '1rem' }}
     >
@@ -91,7 +105,7 @@ export const Row: IRow = ({ onClick, className, id, row, updateRow }) => {
           onKeyDown={handleRowKeydown}
           tabIndex={id}
           // onClick={handleClickRow}
-          onBlur={handleDisableFocus}
+
           onChange={(e) => updateRow(row.tab, row.order, e.currentTarget.value)}
           // style={noteStyle.styles}
           className={rowClass}

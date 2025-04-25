@@ -28,7 +28,8 @@ export interface INoteCardProps {
 const ROW_ACTION = {
   UPDATE: 'UPDATE',
   ADD: 'ADD',
-  DELETE: 'DELTE',
+  COPY: 'COPY',
+  DELETE: 'DELETE',
 } as const;
 
 const defaultRowList: RowData[] = [
@@ -46,13 +47,47 @@ const defaultRowList: RowData[] = [
   { tab: 3, order: 2, content: 'NoteCardContext Provider' },
   { tab: 3, order: 3, content: '계산 로직 구현해' },
 ];
-
-const rowReducer = (state, action) => {
-  switch (action.type) {
+const DEFAULT_ROW: RowData = {
+  tab: null,
+  order: null,
+  content: '데이터를 입력하세요.',
+};
+const getDefaultRow = (props: RowData): RowData => {
+  return { ...DEFAULT_ROW, ...props };
+};
+type RowActions = keyof typeof ROW_ACTION;
+const rowReducer = (state, action: { type: RowActions; payload: { row?: RowData; tabIdx: number } }) => {
+  const { type, payload } = action;
+  const { tabIdx, row: payloadRow } = payload;
+  console.log(state);
+  switch (type) {
     case ROW_ACTION.UPDATE:
       return state.map((row) =>
-        row.tab === action.tab && row.order === action.order ? { ...row, content: action.newContent } : row
+        row.tab === payloadRow.tab && row.order === payloadRow.order ? { ...row, content: payloadRow.content } : row
       );
+
+    case ROW_ACTION.ADD:
+      return [
+        ...state,
+        {
+          ...getDefaultRow(payloadRow),
+          tab: tabIdx,
+          order: state.filter((row) => row.tab === payload.tabIdx).at(-1).order + 1,
+        },
+      ];
+    case ROW_ACTION.DELETE:
+      console.log(state.filter((row) => row.tab === payloadRow.tab).filter((row) => row.order !== payloadRow.order));
+      return state.filter((row) => row.tab === payloadRow.tab).filter((row) => row.order !== payloadRow.order);
+    case ROW_ACTION.COPY:
+      return [
+        ...state,
+        {
+          ...getDefaultRow(payloadRow),
+          tab: tabIdx,
+          order: state.filter((row) => row.tab === payload.tabIdx).at(-1).order + 1,
+          content: payloadRow.content,
+        },
+      ];
 
     default:
       return state;
@@ -87,6 +122,7 @@ export const NoteCard = ({ rowCount = 6, noteStyles = {} }: INoteCardProps) => {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [newName, setNewName] = useState<string>('');
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [selectedRow, setSelectedRow] = useState<RowData | null>();
 
   const [noteStyle, setNoteStyle] = useState<INoteStyles>({
     content: {
@@ -101,9 +137,27 @@ export const NoteCard = ({ rowCount = 6, noteStyles = {} }: INoteCardProps) => {
   });
 
   const [rowList, dispatch] = useReducer(rowReducer, defaultRowList);
-  const updateRow = (tab, order, newContent) => {
-    dispatch({ type: ROW_ACTION.UPDATE, tab, order, newContent });
+
+  const updateRow = (tab, order, content) => {
+    dispatch({ type: ROW_ACTION.UPDATE, payload: { tabIdx: activeTab, row: { tab, order, content } } });
   };
+
+  const addRow = () => {
+    dispatch({
+      type: ROW_ACTION.ADD,
+      payload: { tabIdx: activeTab, row: null },
+    });
+  };
+  const copyRow = (row: RowData) => {
+    dispatch({
+      type: ROW_ACTION.COPY,
+      payload: { tabIdx: row.tab, row: row },
+    });
+  };
+  const deleteRow = (row: RowData) => {
+    dispatch({ type: ROW_ACTION.DELETE, payload: { tabIdx: row.tab, row: row } });
+  };
+
   const handleNoteKeydown = (ev: React.KeyboardEvent<HTMLDivElement>) => {
     const rows = document.querySelectorAll('.card-content .row');
     const currentIdx = Array.from(rows).findIndex((e) => e === document.activeElement);
@@ -174,11 +228,10 @@ export const NoteCard = ({ rowCount = 6, noteStyles = {} }: INoteCardProps) => {
     }
   };
 
-  const handleRowClick = (id): void => {
-    console.log(id, ' clicked');
-    // active 음 이거 남겨야하나
-    // setRowList((prev) => prev.map((row) => (row.tab === activeTab ? { ...row, active: row.order === id } : row)));
+  const handleRowClick = (row: RowData): void => {
+    console.log(row, ' clicked');
   };
+
   const handleChangeNewTabName = (ev) => {
     setNewName(ev.target.value);
   };
@@ -192,8 +245,15 @@ export const NoteCard = ({ rowCount = 6, noteStyles = {} }: INoteCardProps) => {
 
   return (
     <NoteCardContext.Provider value={{ styles: noteStyle }}>
-      <NoteCardToolbarContext.Provider value={{ position: position, setPosition: setPosition }}>
-        <Toolbar />
+      <NoteCardToolbarContext.Provider
+        value={{
+          position: position,
+          setPosition: setPosition,
+          selectedRow: selectedRow,
+          setSelectedRow: setSelectedRow,
+        }}
+      >
+        <Toolbar onAddRow={addRow} onCopyRow={copyRow} onDeleteRow={deleteRow} />
         {openAddModal && (
           <div className="add-tab-modal">
             <div>add</div>
@@ -232,7 +292,7 @@ export const NoteCard = ({ rowCount = 6, noteStyles = {} }: INoteCardProps) => {
                     // 탭 + order는 추가, 삭제아닌 경우 바뀔일이 없음. 불필요하게 마운트 일어나지 않도록 키 설정
                     key={`${row.tab}-${row.order}`}
                     id={idx}
-                    onClick={() => handleRowClick(row.order)}
+                    onClick={() => handleRowClick(row)}
                     // text={row.content}
                     // row
                     row={row}
