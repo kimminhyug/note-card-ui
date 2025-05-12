@@ -62,3 +62,10 @@
 
 ## 2. 탭 제어 기능 및 제목 추가
 ![note_tab](https://github.com/user-attachments/assets/6923c619-44e4-44dc-b027-dcc95d8b4e77)
+
+## 3. 행 툴바
+![toolbar](https://github.com/user-attachments/assets/f3c50650-2f05-4fd7-9799-4e110f859660)
+
+
+
+
